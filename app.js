@@ -30,15 +30,30 @@ io.sockets.on("connection", function (socket) {
             console.log('Client ID ' + socket.id + ' created room ' + room);
             socket.emit('created', room, socket.id);
 
-        } else if (numClients === 1) {
+        } else {
             console.log('Client ID ' + socket.id + ' joined room ' + room);
-            io.sockets.in(room).emit('join', room);
+            let joinedData = {
+                room: room,
+                userId: socket.id
+            }
+            socket.broadcast.emit('join', joinedData);
             socket.join(room);
             socket.emit('joined', room, socket.id);
             io.sockets.in(room).emit('ready');
-        } else { // max two clients
-            socket.emit('full', room);
-        }
+        } 
+        // else { // max two clients
+        //     socket.emit('full', room);
+        // }
+
+        socket.on('messageSingleUser', function (message) {
+            console.log('Client said: ', message);
+            // for a real app, would be room-only (not broadcast)
+            let data = {
+                ...message.data,
+                userId: socket.id
+            }
+            socket.broadcast.emit('messageSingleUser', data, message.userId);
+        });
 
         socket.on('message', function (message) {
             console.log('Client said: ', message);

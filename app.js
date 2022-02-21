@@ -55,6 +55,10 @@ io.sockets.on("connection", function (socket) {
             socket.broadcast.emit('messageSingleUser', data, message.userId);
         });
 
+        socket.on('speak', function (message) {
+            socket.broadcast.emit('speak', message);
+        })
+
         socket.on('message', function (message) {
             console.log('Client said: ', message);
             // for a real app, would be room-only (not broadcast)
